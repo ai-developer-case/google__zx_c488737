@@ -181,7 +181,7 @@ In second argument, array of choices for Tab autocompletion can be specified.
   
 ```ts
 function question(query?: string, options?: QuestionOptions): Promise<string>
-type QuestionOptions = { choices: string[] }
+type QuestionOptions = { choices?: string[] }
 ```
 
 ### `sleep()`
