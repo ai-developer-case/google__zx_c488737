@@ -178,10 +178,9 @@ let token = await question('Choose env variable: ', {
 ```
 
 In second argument, array of choices for Tab autocompletion can be specified.
-  
 ```ts
 function question(query?: string, options?: QuestionOptions): Promise<string>
-type QuestionOptions = { choices: string[] }
+type QuestionOptions = { choices?: string[] }
 ```
 
 ### `sleep()`
@@ -189,6 +188,7 @@ type QuestionOptions = { choices: string[] }
 A wrapper around the `setTimeout` function.
 
 ```js
+await sleep(1000)
 await sleep(1000)
 ```
 
@@ -199,12 +199,9 @@ Changes behavior of `$` to not throw an exception on non-zero exit codes.
 ```ts
 function nothrow<P>(p: P): P
 ```
-
 Usage:
-
 ```js
 await nothrow($`grep something from-file`)
-
 // Inside a pipe():
 
 await $`find ./examples -type f -print0`
@@ -214,68 +211,44 @@ await $`find ./examples -type f -print0`
 
 If only the `exitCode` is needed, you can use the next code instead:
 
-```js
 if (await $`[[ -d path ]]`.exitCode == 0) {
   ...
 }
-
 // Equivalent of:
-
 if ((await nothrow($`[[ -d path ]]`)).exitCode == 0) {
   ...
 }
-```
 ### `quiet()`
-
-Changes behavior of `$` to disable verbose output.
-
-```ts
+Changes behavior of `$` to not output anything.
 function quiet<P>(p: P): P
 ```
-
 Usage:
-
 ```js
 await quiet($`grep something from-file`)
 // Command and output will not be displayed.
 ```
-
 ## Packages
-
 Following packages are available without importing inside scripts.
-
 ### `chalk` package
-
 The [chalk](https://www.npmjs.com/package/chalk) package.
-
 ```js
 console.log(chalk.blue('Hello world!'))
 ```
-
 ### `fs` package
 
 The [fs-extra](https://www.npmjs.com/package/fs-extra) package.
 
-```js
 let content = await fs.readFile('./package.json')
 ```
-
 ### `os` package
 
 The [os](https://nodejs.org/api/os.html) package.
 
 ```js
 await $`cd ${os.homedir()} && mkdir example`
-```
-
-### `path` package
-
 The [path](https://nodejs.org/api/path.html) package.
-
-```js
 await $`mkdir ${path.join(basedir, 'output')}`
 ```
-
 ### `globby` package
 
 The [globby](https://github.com/sindresorhus/globby) package.
@@ -284,54 +257,50 @@ The [globby](https://github.com/sindresorhus/globby) package.
 let packages = await globby(['package.json', 'packages/*/package.json'])
 
 let pictures = globby.globbySync('content/*.(jpg|png)')
-```
-
 Also, globby available via the `glob` shortcut:
 
 ```js
 await $`svgo ${await glob('*.svg')}`
+### `question()`
+
+A wrapper around the [readline](https://nodejs.org/api/readline.html) package.
+
+```ts
+function question(query?: string, options?: QuestionOptions): Promise<string>
+type QuestionOptions = { choices?: string[] }
 ```
 
-### `yaml` package
-
-The [yaml](https://www.npmjs.com/package/yaml) package.
+Usage:
 
 ```js
-console.log(YAML.parse('foo: bar').foo)
+let bear = await question('What kind of bear is best? ')
+let token = await question('Choose env variable: ', {
+  choices: Object.keys(process.env)
+})
+```
 ```
 
+The [yaml](https://www.npmjs.com/package/yaml) package.
+console.log(YAML.parse('foo: bar').foo)
+```
 ### `minimist` package
-
 The [minimist](https://www.npmjs.com/package/minimist) package.
 
 Available as global const `argv`.
 
-### `which` package
-
 The [which](https://github.com/npm/node-which) package.
-
-```js
 let node = await which('node')
-
 let node = which.sync('node')
-```
-
 ## Configuration
-
 ### `$.shell`
-
 Specifies what shell is used. Default is `which bash`.
 
-```js
 $.shell = '/usr/bin/bash'
 ```
-
 Or use a CLI argument: `--shell=/bin/bash`
-
 ### `$.spawn`
-
 Specifies a `spawn` api. Defaults to `require('child_process').spawn`.
-
+```
 ### `$.maxBuffer`
 
 Specifies the largest number of bytes allowed on stdout or stderr.
